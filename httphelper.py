@@ -30,7 +30,7 @@ def assign_job(queue, count=0):
             res = r.json()
         except:
             traceback.print_exc()
-            res = {'result': False}
+            res = {'result': False, 'msg': "Network Exception"}
         if res['result']:
             return {'id': res['id'], 'json': res['json'], 'docker': res['docker']}
         else:
@@ -45,19 +45,24 @@ def assign_job(queue, count=0):
         return False
 
 
-def sync_log(id, log):
+def sync_log(id, log, count=0):
     payload = {'key': apiKey, 'log':  log}
     try:
         r = requests.post(apiUrl + "/jobs/" + str(id) + "/log", params=payload)
         res = r.json()
     except:
         traceback.print_exc()
-        res = {'result': False}
+        res = {'result': False, 'msg': "Network Exception"}
     if res['result']:
         return True
     else:
         print(res['msg'])
-        return False
+        if count < tryMax:
+            print("Retrying")
+            return sync_log(id, log, count + 1)
+        else:
+            print("Failed too many times, giving up")
+            return False
 
 
 def cancel_job(id, count=0):
@@ -67,7 +72,7 @@ def cancel_job(id, count=0):
         res = r.json()
     except:
         traceback.print_exc()
-        res = {'result': False}
+        res = {'result': False, 'msg': "Network Exception"}
     if res['result']:
         return True
     else:
@@ -80,16 +85,21 @@ def cancel_job(id, count=0):
             return False
 
 
-def call_judge(id):
+def call_judge(id, count=0):
     payload = {'key': apiKey}
     try:
         r = requests.get(apiUrl + "/jobs/" + str(id) + "/judge", params=payload)
         res = r.json()
     except:
         traceback.print_exc()
-        res = {'result': False}
+        res = {'result': False, 'msg': "Network Exception"}
     if res['result']:
         return True
     else:
         print(res['msg'])
-        return False
+        if count < tryMax:
+            print("Retrying")
+            return call_judge(id, count + 1)
+        else:
+            print("Failed too many times, giving up")
+            return False
