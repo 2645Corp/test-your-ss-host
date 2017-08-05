@@ -3,6 +3,7 @@
 
 import requests
 import config
+import traceback
 
 apiKey = config.API_KEY
 apiUrl = config.API_URL
@@ -11,16 +12,25 @@ runHost = config.HOST_NAME
 
 
 def get_queuing_job_list():
-    r = requests.get(apiUrl + "/jobs/queue")
-    queue = r.json()
-    return queue
+    try:
+        r = requests.get(apiUrl + "/jobs/queue")
+        queue = r.json()
+    except:
+        traceback.print_exc()
+        return []
+    else:
+        return queue
 
 
 def assign_job(queue, count=0):
     if len(queue) > 0:
         payload = {'key': apiKey, 'run_host': runHost}
-        r = requests.post(apiUrl + "/jobs/" + str(queue[0]['id']), params=payload)
-        res = r.json()
+        try:
+            r = requests.post(apiUrl + "/jobs/" + str(queue[0]['id']), params=payload)
+            res = r.json()
+        except:
+            traceback.print_exc()
+            res = {'result': False}
         if res['result']:
             return {'id': res['id'], 'json': res['json'], 'docker': res['docker']}
         else:
@@ -37,8 +47,12 @@ def assign_job(queue, count=0):
 
 def sync_log(id, log):
     payload = {'key': apiKey, 'log':  log}
-    r = requests.post(apiUrl + "/jobs/" + str(id) + "/log", params=payload)
-    res = r.json()
+    try:
+        r = requests.post(apiUrl + "/jobs/" + str(id) + "/log", params=payload)
+        res = r.json()
+    except:
+        traceback.print_exc()
+        res = {'result': False}
     if res['result']:
         return True
     else:
@@ -48,8 +62,12 @@ def sync_log(id, log):
 
 def cancel_job(id, count=0):
     payload = {'key': apiKey, '_method': 'DELETE'}
-    r = requests.post(apiUrl + "/jobs/" + str(id), params=payload)
-    res = r.json()
+    try:
+        r = requests.post(apiUrl + "/jobs/" + str(id), params=payload)
+        res = r.json()
+    except:
+        traceback.print_exc()
+        res = {'result': False}
     if res['result']:
         return True
     else:
@@ -64,8 +82,12 @@ def cancel_job(id, count=0):
 
 def call_judge(id):
     payload = {'key': apiKey}
-    r = requests.get(apiUrl + "/jobs/" + str(id) + "/judge", params=payload)
-    res = r.json()
+    try:
+        r = requests.get(apiUrl + "/jobs/" + str(id) + "/judge", params=payload)
+        res = r.json()
+    except:
+        traceback.print_exc()
+        res = {'result': False}
     if res['result']:
         return True
     else:
