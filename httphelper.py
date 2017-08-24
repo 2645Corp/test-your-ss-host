@@ -3,6 +3,7 @@
 
 import requests
 import config
+import sys
 import traceback
 
 apiKey = config.API_KEY
@@ -16,7 +17,7 @@ def get_queuing_job_list():
         r = requests.get(apiUrl + "/jobs/queue")
         queue = r.json()
     except:
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         return []
     else:
         return queue
@@ -29,7 +30,7 @@ def assign_job(queue, count=0):
             r = requests.post(apiUrl + "/jobs/" + str(queue[0]['id']), params=payload)
             res = r.json()
         except:
-            traceback.print_exc()
+            traceback.print_exc(file=sys.stderr)
             res = {'result': False, 'msg': "Network Exception"}
         if res['result']:
             return {'id': res['id'], 'json': res['json'], 'docker': res['docker']}
@@ -51,7 +52,7 @@ def sync_log(id, log, count=0):
         r = requests.post(apiUrl + "/jobs/" + str(id) + "/log", params=payload)
         res = r.json()
     except:
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         res = {'result': False, 'msg': "Network Exception"}
     if res['result']:
         return True
@@ -71,7 +72,7 @@ def cancel_job(id, count=0):
         r = requests.post(apiUrl + "/jobs/" + str(id), params=payload)
         res = r.json()
     except:
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         res = {'result': False, 'msg': "Network Exception"}
     if res['result']:
         return True
@@ -91,7 +92,7 @@ def call_judge(id, count=0):
         r = requests.get(apiUrl + "/jobs/" + str(id) + "/judge", params=payload)
         res = r.json()
     except:
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         res = {'result': False, 'msg': "Network Exception"}
     if res['result']:
         return True
