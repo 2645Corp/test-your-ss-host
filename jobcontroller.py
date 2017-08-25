@@ -24,8 +24,8 @@ def main_loop():
     while loop:
         print("Polling queue")
         queue = httphelper.get_queuing_job_list()
-        print("There are " + str(len(queue)) + " jobs in queue")
-        print("Currently running " + str(len(threads)) + " threads")
+        print(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + ": There are " + str(len(queue)) + " jobs in queue")
+        print(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + ": Currently running " + str(len(threads)) + " threads")
         if len(queue) > 0 and len(threads) < maxThreads:
             job = httphelper.assign_job(queue)
             if job:
